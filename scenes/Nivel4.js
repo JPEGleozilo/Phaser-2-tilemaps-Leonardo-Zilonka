@@ -53,6 +53,8 @@ create() {
 
     this.restante = this.objetos - this.recolectados;
 
+    console.log ('Objetivos:', this.objetos);
+
     const spawn = map.findObject("jugador", (obj) => obj.name === "player");
 
     this.player = this.physics.add.sprite(spawn.x * 5, spawn.y * 5, "player");
