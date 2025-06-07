@@ -48,12 +48,9 @@ create() {
     })
 
     this.objetos = this.objetivosGroup.countActive(true);
-    this.score = 0;
     this.recolectados = 0;
 
     this.restante = this.objetos - this.recolectados;
-
-    console.log ('Objetivos:', this.objetos);
 
     const spawn = map.findObject("jugador", (obj) => obj.name === "player");
 

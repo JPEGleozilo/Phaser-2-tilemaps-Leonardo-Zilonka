@@ -46,7 +46,6 @@ create() {
     })
 
     this.objetos = this.objetivosGroup.countActive(true);
-    this.score = 0;
     this.recolectados = 0;
 
     this.restante = this.objetos - this.recolectados;
