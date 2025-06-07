@@ -1,6 +1,6 @@
-export default class Nivel3 extends Phaser.Scene {
+export default class Nivel4 extends Phaser.Scene {
   constructor() {
-    super("Nivel3");
+    super("Nivel4");
   }
 
   init(data){
@@ -9,13 +9,14 @@ export default class Nivel3 extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON("nivel3", "public/assets/tilemap/Nivel3.json");
+    this.load.tilemapTiledJSON("nivel4", "public/assets/tilemap/Nivel4.json");
     this.load.image("tilemap", "public/assets/tilemap/tilemap.png");
     this.load.image("objetivo", "public/assets/objective.png");
     this.load.spritesheet("player", "public/assets/player.png", {
         frameWidth: 6,
         frameHeight: 6,
     })
+    this.load.image("enemigo", "public/assets/enemigo.png");
 }
 
 create() {
@@ -25,7 +26,8 @@ create() {
     this.textures.get('tilemap').setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get('player').setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get('objetivo').setFilter(Phaser.Textures.FilterMode.NEAREST);
-    const map = this.make.tilemap({ key: "nivel3" });
+    this.textures.get('enemigo').setFilter(Phaser.Textures.FilterMode.NEAREST);
+    const map = this.make.tilemap({ key: "nivel4" });
     const tileset = map.addTilesetImage("tilemap", "tilemap");
     const fondo = map.createLayer("fondo", tileset, 0, 0);
     const paredes = map.createLayer("paredes", tileset, 0, 0);
@@ -102,11 +104,52 @@ create() {
         callbackScope: this,
         loop: true
     });
+        
+    const enemigos = map.getObjectLayer("enemigos");
+    this.enemigosGroup = this.physics.add.group();
+    enemigos.objects.forEach((obj) => {
+        const enemigo = this.enemigosGroup.create(obj.x * 5, obj.y * 5, "enemigo");
+        
+        enemigo.setScale(5);
+        enemigo.setOrigin(0.5, 0.5);
 
+        enemigo.clase = obj.type || null;
+
+        if (enemigo.clase === "x") {
+            enemigo.setVelocityX(-275);
+            enemigo.setVelocityY(0);
+            enemigo.setAngle(90);
+        } else if (enemigo.clase === "y") {
+            enemigo.setVelocityY(275);
+            enemigo.setVelocityX(0);
+        }
+        this.physics.add.collider(enemigo, paredes);
+        enemigo.setBounce(1);
+
+        console.log('Enemigo en:', enemigo.x, enemigo.y, 'clase:', enemigo.clase);
+        });
+
+    if (this.player && this.enemigosGroup) {
+        this.physics.add.overlap(this.player, this.enemigosGroup, () => {
+            this.scene.start("derrota", { score: this.score, tiempo: this.tiempo });
+        });
+    }
 
 }
 
 update() {
+
+    this.enemigosGroup.children.iterate((enemigo) => {
+        if (enemigo.clase === "x" && enemigo.body.velocity.x < 0) {
+            enemigo.setAngle(270);
+        }else if (enemigo.clase === "x" && enemigo.body.velocity.x > 0) {
+            enemigo.setAngle(90);
+        }else if (enemigo.clase === "y" && enemigo.body.velocity.y < 0) {
+            enemigo.setAngle(0);
+        }else if (enemigo.clase === "y" && enemigo.body.velocity.y > 0) {
+            enemigo.setAngle(180);
+        }
+    });
 
     this.tiempotexto.setPosition(0.5 * this.cameras.main.width, 0.05 * this.cameras.main.height, `${this.tiempo}s`, {
     fontSize: '16px',
@@ -146,7 +189,7 @@ update() {
             });
             this.textorestante.setOrigin(0.5, 0.5);
         } else if (this.restante <= 0) {
-            this.scene.start("Nivel4", { score: this.score, tiempo: this.tiempo });
+            this.scene.start("victoria", { score: this.score, tiempo: this.tiempo });
         }
     }
   }

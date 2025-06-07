@@ -19,10 +19,8 @@ export default class Nivel2 extends Phaser.Scene {
 }
 
 create() {
-    this.objetos = 6;
-    this.recolectados = 0;
 
-    this.restante = this.objetos - this.recolectados;
+    this.cameras.main.setOrigin(0.5, 0.5);
 
     this.textures.get('tilemap').setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get('player').setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -46,13 +44,22 @@ create() {
         objetivo.setScale(5);
         objetivo.setOrigin(0.5, 0.5);
     })
-    
+
+    this.objetos = this.objetivosGroup.countActive(true);
+    this.score = 0;
+    this.recolectados = 0;
+
+    this.restante = this.objetos - this.recolectados;
 
     const spawn = map.findObject("jugador", (obj) => obj.name === "player");
 
     this.player = this.physics.add.sprite(spawn.x * 5, spawn.y * 5, "player");
     this.player.setScale(5);
     this.player.setOrigin(0.5, 0.5)
+
+    this.cameras.main.setBounds(0, 0, map.widthInPixels * 5, map.heightInPixels * 5);
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    this.cameras.main.roundPixels = true;
 
     this.player.setCollideWorldBounds(true);
     paredes.setCollisionByExclusion([-1]);
@@ -83,7 +90,7 @@ create() {
         }
     });
 
-    this.tiempotexto = this.add.text(0.5 * this.scale.width, 20, `${this.tiempo}s`, {
+    this.tiempotexto = this.add.text(0.5 * this.cameras.main.width, 0.05 * this.cameras.main.height, `${this.tiempo}s`, {
         fontSize: '16px',
         fill: '#fff'
     }).setOrigin(0.5, 0.5);
@@ -97,10 +104,15 @@ create() {
         loop: true
     });
 
-
 }
 
 update() {
+
+    this.tiempotexto.setPosition(0.5 * this.cameras.main.width, 0.05 * this.cameras.main.height, `${this.tiempo}s`, {
+    fontSize: '16px',
+    fill: '#fff'
+}).setOrigin(0.5, 0.5)
+  .setScrollFactor(0);
 
     if (this.textorestante) {
         this.textorestante.destroy();
