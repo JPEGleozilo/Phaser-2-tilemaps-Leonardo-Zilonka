@@ -1,13 +1,15 @@
-export default class Nivel1 extends Phaser.Scene {
+export default class Nivel2 extends Phaser.Scene {
   constructor() {
-    super("nivel1");
+    super("Nivel2");
   }
 
-init() {
-}
+  init(data){
+    this.score = data.score;
+    this.tiempo = data.tiempo;
+  }
 
-preload() {
-    this.load.tilemapTiledJSON("nivel1", "public/assets/tilemap/Nivel1.json");
+  preload() {
+    this.load.tilemapTiledJSON("nivel2", "public/assets/tilemap/Nivel2.json");
     this.load.image("tilemap", "public/assets/tilemap/tilemap.png");
     this.load.image("objetivo", "public/assets/objective.png");
     this.load.spritesheet("player", "public/assets/player.png", {
@@ -17,8 +19,7 @@ preload() {
 }
 
 create() {
-    this.objetos = 5;
-    this.score = 0;
+    this.objetos = 6;
     this.recolectados = 0;
 
     this.restante = this.objetos - this.recolectados;
@@ -26,7 +27,7 @@ create() {
     this.textures.get('tilemap').setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get('player').setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.textures.get('objetivo').setFilter(Phaser.Textures.FilterMode.NEAREST);
-    const map = this.make.tilemap({ key: "nivel1" });
+    const map = this.make.tilemap({ key: "nivel2" });
     const tileset = map.addTilesetImage("tilemap", "tilemap");
     const fondo = map.createLayer("fondo", tileset, 0, 0);
     const paredes = map.createLayer("paredes", tileset, 0, 0);
@@ -82,8 +83,6 @@ create() {
         }
     });
 
-    this.tiempo = 0
-
     this.tiempotexto = this.add.text(0.5 * this.scale.width, 20, `${this.tiempo}s`, {
         fontSize: '16px',
         fill: '#fff'
@@ -97,6 +96,7 @@ create() {
         callbackScope: this,
         loop: true
     });
+
 
 }
 
@@ -134,9 +134,9 @@ update() {
             });
             this.textorestante.setOrigin(0.5, 0.5);
         } else if (this.restante <= 0) {
-            this.scene.start("Nivel2", { score: this.score, tiempo: this.tiempo });
+            this.scene.start("victoria", { score: this.score, tiempo: this.tiempo });
         }
     }
-
   }
+  
 }
